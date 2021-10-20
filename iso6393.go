@@ -3,7 +3,7 @@ package iso639_3
 // LanguageScope represents language scope as defined in ISO 639-3
 type LanguageScope rune
 
-// LanguageScope represents language scope as defined in ISO 639-3
+// LanguageType represents language scope as defined in ISO 639-3
 type LanguageType rune
 
 const (
