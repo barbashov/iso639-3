@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"reflect"
 	"time"
 )
 
@@ -24,19 +25,41 @@ const (
 
 	sourceFilePrefix = `package iso639_3
 
-// Languages lookup table. Keys are ISO 639-3 codes
-var Languages = map[string]Language{`
-	sourceFileSuffix     = `}`
-	languageStructFormat = `"%s": {
-	ID: "%s",
-	Part2B: "%s",
-	Part2T: "%s",
-	Part1: "%s",
-	Scope: "%s",
-	LanguageType: "%s",
-	Name: "%s",
-	Comment: "%s",
-}, `
+`
+
+	part3Prefix = `// Languages part 3 lookup table. Keys are ISO 639-3 codes
+var LanguagesPart3 = map[string]Language{
+`
+
+	part2Prefix = `// Languages part 2 lookup table. Keys are ISO 639-2 codes
+var LanguagesPart2 = map[string]Language{
+`
+
+	part1Prefix = `// Languages part 1 lookup table. Keys are ISO 639-1 codes
+var LanguagesPart1 = map[string]Language{
+`
+
+	lookupSuffix = `}
+`
+
+	languageStructFormat = `"%s": {	Part3: "%s", Part2B: "%s", Part2T: "%s", Part1: "%s", 	Scope: "%s", LanguageType: "%s", Name: "%s", Comment: "%s", },
+`
+)
+
+var (
+	languageStructFields = []struct {
+		name      string
+		fieldType reflect.Kind
+	}{
+		{"Part3", reflect.String},
+		{"Part2B", reflect.String},
+		{"Part2T", reflect.String},
+		{"Part1", reflect.String},
+		{"Scope", reflect.Uint8}, // no rune kind :(
+		{"LanguageType", reflect.Uint8},
+		{"Name", reflect.String},
+		{"Comment", reflect.String},
+	}
 )
 
 func main() {
@@ -96,6 +119,50 @@ func getInput(uri string) io.Reader {
 	return bytes.NewReader(bs)
 }
 
+func outputStruct(w io.Writer, key string, record []string) error {
+	if len(record) != len(languageStructFields) {
+		log.Fatalf("outputStruct got malformed record: %v", record)
+	}
+
+	_, err := fmt.Fprintf(w, `"%s": {`, key)
+	if err != nil {
+		return err
+	}
+
+	comma := false
+	for i, value := range record {
+		if value == "" {
+			continue
+		}
+
+		if comma {
+			_, err = fmt.Fprint(w, ", ")
+			if err != nil {
+				return err
+			}
+		}
+
+		field := languageStructFields[i]
+
+		if field.fieldType == reflect.String {
+			_, err = fmt.Fprintf(w, `%s: "%s"`, field.name, value)
+		} else if field.fieldType == reflect.Uint8 {
+			_, err = fmt.Fprintf(w, `%s: '%s'`, field.name, value)
+		} else {
+			return fmt.Errorf("unknown field kind: %v", field)
+		}
+
+		if err != nil {
+			return err
+		}
+
+		comma = true
+	}
+
+	_, err = fmt.Fprintln(w, "},")
+	return err
+}
+
 func outputLookup(w io.Writer, records [][]string) {
 	buf := bytes.Buffer{}
 
@@ -104,24 +171,79 @@ func outputLookup(w io.Writer, records [][]string) {
 		log.Fatalf("Error generating: %v", err)
 	}
 
+	/* Part 3 lookup */
+
+	_, err = fmt.Fprintf(&buf, part3Prefix)
+	if err != nil {
+		log.Fatalf("Error generating: %v", err)
+	}
+
 	for _, record := range records {
-		_, err = fmt.Fprintf(&buf, languageStructFormat,
-			record[0],
-			record[0],
-			record[1],
-			record[2],
-			record[3],
-			record[4],
-			record[5],
-			record[6],
-			record[7],
-		)
+		key := record[0]
+		err = outputStruct(&buf, key, record)
 		if err != nil {
 			log.Fatalf("Error generating: %v", err)
 		}
 	}
 
-	_, err = fmt.Fprintf(&buf, sourceFileSuffix)
+	_, err = fmt.Fprintf(&buf, lookupSuffix)
+	if err != nil {
+		log.Fatalf("Error generating: %v", err)
+	}
+
+	/* Part 2 lookup */
+
+	_, err = fmt.Fprintf(&buf, part2Prefix)
+	if err != nil {
+		log.Fatalf("Error generating: %v", err)
+	}
+
+	for _, record := range records {
+		key2b := record[1]
+		key2t := record[2]
+		if key2b == "" {
+			continue
+		}
+
+		err = outputStruct(&buf, key2b, record)
+		if err != nil {
+			log.Fatalf("Error generating: %v", err)
+		}
+
+		// there are no conflicts between part2b and part2t identifiers so we're allowed to do that
+		if key2b != key2t {
+			err = outputStruct(&buf, key2t, record)
+			if err != nil {
+				log.Fatalf("Error generating: %v", err)
+			}
+		}
+	}
+
+	_, err = fmt.Fprintf(&buf, lookupSuffix)
+	if err != nil {
+		log.Fatalf("Error generating: %v", err)
+	}
+
+	/* Part 1 lookup */
+
+	_, err = fmt.Fprintf(&buf, part1Prefix)
+	if err != nil {
+		log.Fatalf("Error generating: %v", err)
+	}
+
+	for _, record := range records {
+		key := record[3]
+		if key == "" {
+			continue
+		}
+
+		err = outputStruct(&buf, key, record)
+		if err != nil {
+			log.Fatalf("Error generating: %v", err)
+		}
+	}
+
+	_, err = fmt.Fprintf(&buf, lookupSuffix)
 	if err != nil {
 		log.Fatalf("Error generating: %v", err)
 	}
