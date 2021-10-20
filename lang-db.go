@@ -1,6 +1,6 @@
 package iso639_3
 
-// Languages part 3 lookup table. Keys are ISO 639-3 codes
+// LanguagesPart3 lookup table. Keys are ISO 639-3 codes
 var LanguagesPart3 = map[string]Language{
 	"aaa": {Part3: "aaa", Scope: 'I', LanguageType: 'L', Name: "Ghotuo"},
 	"aab": {Part3: "aab", Scope: 'I', LanguageType: 'L', Name: "Alumu-Tesu"},
@@ -7897,7 +7897,7 @@ var LanguagesPart3 = map[string]Language{
 	"zzj": {Part3: "zzj", Scope: 'I', LanguageType: 'L', Name: "Zuojiang Zhuang"},
 }
 
-// Languages part 2 lookup table. Keys are ISO 639-2 codes
+// LanguagesPart2 lookup table. Keys are ISO 639-2 codes
 var LanguagesPart2 = map[string]Language{
 	"aar": {Part3: "aar", Part2B: "aar", Part2T: "aar", Part1: "aa", Scope: 'I', LanguageType: 'L', Name: "Afar"},
 	"abk": {Part3: "abk", Part2B: "abk", Part2T: "abk", Part1: "ab", Scope: 'I', LanguageType: 'L', Name: "Abkhazian"},
@@ -8341,7 +8341,7 @@ var LanguagesPart2 = map[string]Language{
 	"zza": {Part3: "zza", Part2B: "zza", Part2T: "zza", Scope: 'M', LanguageType: 'L', Name: "Zaza"},
 }
 
-// Languages part 1 lookup table. Keys are ISO 639-1 codes
+// LanguagesPart1 lookup table. Keys are ISO 639-1 codes
 var LanguagesPart1 = map[string]Language{
 	"aa": {Part3: "aar", Part2B: "aar", Part2T: "aar", Part1: "aa", Scope: 'I', LanguageType: 'L', Name: "Afar"},
 	"ab": {Part3: "abk", Part2B: "abk", Part2T: "abk", Part1: "ab", Scope: 'I', LanguageType: 'L', Name: "Abkhazian"},

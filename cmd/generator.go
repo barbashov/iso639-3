@@ -20,29 +20,25 @@ import (
 const (
 	defaultInput       = "https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab"
 	httpTimeout        = 60 * time.Second
-	utf8BOM            = "\uFEFF"
 	inputFileSeparator = '\t'
 
 	sourceFilePrefix = `package iso639_3
 
 `
 
-	part3Prefix = `// Languages part 3 lookup table. Keys are ISO 639-3 codes
+	part3Prefix = `// LanguagesPart3 lookup table. Keys are ISO 639-3 codes
 var LanguagesPart3 = map[string]Language{
 `
 
-	part2Prefix = `// Languages part 2 lookup table. Keys are ISO 639-2 codes
+	part2Prefix = `// LanguagesPart2 lookup table. Keys are ISO 639-2 codes
 var LanguagesPart2 = map[string]Language{
 `
 
-	part1Prefix = `// Languages part 1 lookup table. Keys are ISO 639-1 codes
+	part1Prefix = `// LanguagesPart1 lookup table. Keys are ISO 639-1 codes
 var LanguagesPart1 = map[string]Language{
 `
 
 	lookupSuffix = `}
-`
-
-	languageStructFormat = `"%s": {	Part3: "%s", Part2B: "%s", Part2T: "%s", Part1: "%s", 	Scope: "%s", LanguageType: "%s", Name: "%s", Comment: "%s", },
 `
 )
 
@@ -166,14 +162,14 @@ func outputStruct(w io.Writer, key string, record []string) error {
 func outputLookup(w io.Writer, records [][]string) {
 	buf := bytes.Buffer{}
 
-	_, err := fmt.Fprintf(&buf, sourceFilePrefix)
+	_, err := fmt.Fprint(&buf, sourceFilePrefix)
 	if err != nil {
 		log.Fatalf("Error generating: %v", err)
 	}
 
 	/* Part 3 lookup */
 
-	_, err = fmt.Fprintf(&buf, part3Prefix)
+	_, err = fmt.Fprint(&buf, part3Prefix)
 	if err != nil {
 		log.Fatalf("Error generating: %v", err)
 	}
@@ -186,14 +182,14 @@ func outputLookup(w io.Writer, records [][]string) {
 		}
 	}
 
-	_, err = fmt.Fprintf(&buf, lookupSuffix)
+	_, err = fmt.Fprint(&buf, lookupSuffix)
 	if err != nil {
 		log.Fatalf("Error generating: %v", err)
 	}
 
 	/* Part 2 lookup */
 
-	_, err = fmt.Fprintf(&buf, part2Prefix)
+	_, err = fmt.Fprint(&buf, part2Prefix)
 	if err != nil {
 		log.Fatalf("Error generating: %v", err)
 	}
@@ -219,14 +215,14 @@ func outputLookup(w io.Writer, records [][]string) {
 		}
 	}
 
-	_, err = fmt.Fprintf(&buf, lookupSuffix)
+	_, err = fmt.Fprint(&buf, lookupSuffix)
 	if err != nil {
 		log.Fatalf("Error generating: %v", err)
 	}
 
 	/* Part 1 lookup */
 
-	_, err = fmt.Fprintf(&buf, part1Prefix)
+	_, err = fmt.Fprint(&buf, part1Prefix)
 	if err != nil {
 		log.Fatalf("Error generating: %v", err)
 	}
@@ -243,7 +239,7 @@ func outputLookup(w io.Writer, records [][]string) {
 		}
 	}
 
-	_, err = fmt.Fprintf(&buf, lookupSuffix)
+	_, err = fmt.Fprint(&buf, lookupSuffix)
 	if err != nil {
 		log.Fatalf("Error generating: %v", err)
 	}

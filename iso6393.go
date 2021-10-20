@@ -1,21 +1,25 @@
 package iso639_3
 
+// LanguageScope represents language scope as defined in ISO 639-3
 type LanguageScope rune
+
+// LanguageScope represents language scope as defined in ISO 639-3
 type LanguageType rune
 
 const (
 	LanguageTypeIndividual    LanguageScope = 'I'
-	LanguageTypeSpecial                     = 'S'
-	LanguageTypeMacrolanguage               = 'M'
+	LanguageTypeSpecial       LanguageScope = 'S'
+	LanguageTypeMacrolanguage LanguageScope = 'M'
 
 	LanguageScopeLiving      LanguageType = 'L'
-	LanguageScopeHistorical               = 'H'
-	LanguageScopeAncient                  = 'A'
-	LanguageScopeExtinct                  = 'E'
-	LanguageScopeConstructed              = 'C'
-	LanguageScopeSpecial                  = 'S'
+	LanguageScopeHistorical  LanguageType = 'H'
+	LanguageScopeAncient     LanguageType = 'A'
+	LanguageScopeExtinct     LanguageType = 'E'
+	LanguageScopeConstructed LanguageType = 'C'
+	LanguageScopeSpecial     LanguageType = 'S'
 )
 
+// Language holds language info - all ISO 639 codes along with name and some additional info
 type Language struct {
 	Part3        string // ISO639-3 code
 	Part2B       string // ISO639-2 bibliographic code
